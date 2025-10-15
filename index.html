@@ -1,0 +1,185 @@
+<!doctype html>
+
+<html lang="so">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Examen Nacionalidad Española A2 – Práctica</title>
+  <style>
+    :root{--bg:#f8fafc;--card:#fff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--ok:#16a34a;--ok-bg:#dcfce7;--bad:#dc2626;--bad-bg:#fee2e2;--accent:#0f172a}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+    .wrap{max-width:960px;margin:auto;padding:20px}
+    header h1{font-size:clamp(22px,3.5vw,34px);margin:0 0 6px}
+    header p{color:var(--muted);margin:0 0 18px}
+    .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 18px}
+    .tab{padding:10px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer}
+    .tab[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(15,23,42,.15)}
+    .bar{display:flex;justify-content:space-between;align-items:center;margin:10px 0 14px}
+    .reset{border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 12px;cursor:pointer}
+    .grid{display:grid;gap:14px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+    .card h3{margin:0 0 6px}
+    .prompt{margin:0 0 10px}
+    .opts{display:grid;gap:8px}
+    .opt{display:flex;gap:10px;align-items:center;width:100%;text-align:left;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer}
+    .opt .badge{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:999px;border:1px solid var(--line);font-weight:700;font-size:12px}
+    .opt.correct{background:var(--ok-bg);border-color:var(--ok)}
+    .opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
+    .opt[disabled]{opacity:.8;cursor:default}
+    .exp{margin-top:8px;color:var(--muted);font-size:14px}
+    audio{width:100%}
+    footer{color:var(--muted);font-size:13px;margin-top:22px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Examen Nacionalidad Española A2 – Práctica</h1>
+      <p>4 qaybood: Lectura, Auditiva, Escribir, Oral. Door A/B/C; jawaabta saxda ah → <b style="color:var(--ok)">cagaar</b>, khalad → <b style="color:var(--bad)">casaan</b>.</p>
+    </header><nav id="tabs" class="tabs" role="tablist" aria-label="Qaybaha imtixaanka"></nav>
+
+<div class="bar">
+  <div id="score"><b>Natiijooyinka:</b> 0 / 0 sax</div>
+  <button class="reset" id="resetBtn">Nadiifi qaybta</button>
+</div>
+
+<main id="content" class="grid" aria-live="polite"></main>
+
+<footer>
+  *Si aad u beddesho su'aalaha, hoos eeg <code>SECTIONS</code> gudaha faylkan. Waxaad ku dari kartaa <code>audioUrl</code> ama <code>imageUrl</code>.
+</footer>
+
+  </div>  <script>
+    // ======= SU'AALAHA (waxaad si fudud u beddeli kartaa) =======
+    const SECTIONS = [
+      {
+        key: 'lectura', title: 'Lectura', desc: "Ka akhri su'aalaha, dooro A/B/C.",
+        questions: [
+          { id:'lec1', prompt:"María waxay ku nooshahay Madrid. Maalin walba waxay ka shaqaysaa maktabad. Sidee u fahantaa María?", options:["Waxay ka shaqaysaa isbitaal.","Waxay ka shaqaysaa maktabad.","Waxay ku nooshahay Barcelona."], answerIndex:1, explanation:"Qoraalku wuxuu sheegayaa maktabad." },
+          { id:'lec2', prompt:"Pedro wuxuu iibsanayaa tigidh tareen subaxii 08:30. Goorma ayuu baxayaa?", options:["Galabtii","Fiidkii","Subaxii"], answerIndex:2 }
+        ]
+      },
+      {
+        key: 'auditiva', title: 'Auditiva (Dhegeysi)', desc: "Dhageyso clip-ka kadib dooro.",
+        questions: [
+          { id:'aud1', prompt:"Dhageyso: Waa kee fasalka uu ka bilaabanayo 9:00?", options:["Isbaanish A2","Ingiriisi B1","Faransiis A1"], answerIndex:0,
+            audioUrl:'https://cdn.pixabay.com/download/audio/2021/09/14/audio_0a5ed2b6c6.mp3?filename=short-notice-ambient-9094.mp3' },
+          { id:'aud2', prompt:"Dhageyso: Waa maxay qiimaha saxda ah ee sanduuqa tufaaxa?", options:["€5","€8","€12"], answerIndex:1,
+            audioUrl:'https://cdn.pixabay.com/download/audio/2022/03/15/audio_6d9a5258e4.mp3?filename=announcement-18798.mp3' }
+        ]
+      },
+      {
+        key: 'escribir', title: 'Escribir (Qorid)', desc: "Dooro xulashada ugu habboon qoraalka.",
+        questions: [
+          { id:'esc1', prompt:"Dooro salaanta ku habboon email rasmi ah: '___, Señora García'.", options:["Hola","Buenos días","Querida amiga"], answerIndex:1,
+            explanation:"'Buenos días' ayaa ku habboon email rasmi ah." },
+          { id:'esc2', prompt:"Dooro: 'Ayer ____ al supermercado.'", options:["voy","fui","iré"], answerIndex:1 }
+        ]
+      },
+      {
+        key: 'oral', title: 'Oral (Afka)', desc: "Dooro jawaabta ugu habboon xaaladda.",
+        questions: [
+          { id:'orl1', prompt:"¿Cómo te llamas?", options:["Tengo 25 años.","Me llamo Amina.","Soy de lunes."], answerIndex:1 },
+          { id:'orl2', prompt:"¿Puedes venir mañana?", options:["Sí, puedo.","Mañana es perro.","Soy estudiar."], answerIndex:0 }
+        ]
+      }
+    ];
+
+    // ======= UI / Logic =======
+    const letters = ['A','B','C'];
+    const tabsEl = document.getElementById('tabs');
+    const contentEl = document.getElementById('content');
+    const scoreEl = document.getElementById('score');
+    const resetBtn = document.getElementById('resetBtn');
+
+    let activeKey = SECTIONS[0].key;
+    const answers = {}; // { [sectionKey]: { [qid]: index } }
+
+    function renderTabs(){
+      tabsEl.innerHTML = '';
+      SECTIONS.forEach(s=>{
+        const b = document.createElement('button');
+        b.className = 'tab';
+        b.textContent = s.title;
+        b.setAttribute('aria-pressed', String(activeKey===s.key));
+        b.addEventListener('click', ()=>{ activeKey = s.key; renderAll(); });
+        tabsEl.appendChild(b);
+      });
+    }
+
+    function calcScore(section){
+      const user = answers[section.key] || {};
+      let correct = 0;
+      section.questions.forEach(q=>{ if(user[q.id]===q.answerIndex) correct++; });
+      return { correct, total: section.questions.length };
+    }
+
+    function renderScore(){
+      const section = SECTIONS.find(s=>s.key===activeKey);
+      const {correct,total} = calcScore(section);
+      scoreEl.innerHTML = `<b>Natiijooyinka:</b> ${correct} / ${total} sax (qaybta ${section.title})`;
+    }
+
+    function renderSection(){
+      const section = SECTIONS.find(s=>s.key===activeKey);
+      contentEl.innerHTML='';
+      const desc = document.createElement('p'); desc.className='prompt'; desc.textContent = section.desc; contentEl.appendChild(desc);
+
+      section.questions.forEach((q,idx)=>{
+        const card = document.createElement('div'); card.className='card';
+        const h3 = document.createElement('h3'); h3.textContent = `Su'aal ${idx+1}`; card.appendChild(h3);
+        const p = document.createElement('p'); p.className='prompt'; p.textContent = q.prompt; card.appendChild(p);
+
+        if(q.imageUrl){ const img = document.createElement('img'); img.src=q.imageUrl; img.alt='Sawir su’aal'; img.style.maxHeight='220px'; img.style.borderRadius='12px'; img.style.objectFit='cover'; img.style.margin='8px 0'; card.appendChild(img); }
+        if(q.audioUrl){ const audio = document.createElement('audio'); audio.controls=true; audio.src=q.audioUrl; audio.style.margin='6px 0 10px'; card.appendChild(audio); }
+
+        const opts = document.createElement('div'); opts.className='opts';
+        q.options.slice(0,3).forEach((opt,i)=>{
+          const btn = document.createElement('button'); btn.className='opt'; btn.type='button';
+          btn.setAttribute('aria-label',`Dooro ${letters[i]}`);
+          btn.innerHTML = `<span class="badge">${letters[i]}</span> <span>${opt}</span>`;
+
+          const sel = (answers[activeKey]||{})[q.id];
+          if(typeof sel==='number'){
+            btn.disabled = true; // hal jawaab keliya
+            if(sel===i){ btn.classList.add(sel===q.answerIndex?'correct':'wrong'); }
+          }
+
+          btn.addEventListener('click', ()=>{
+            if(typeof (answers[activeKey]||{})[q.id] === 'number') return; // hore loo doortay
+            answers[activeKey] = Object.assign({}, answers[activeKey]||{}, { [q.id]: i });
+            // refresh kaliya kaarka hadda
+            renderScore();
+            renderSection();
+          });
+
+          opts.appendChild(btn);
+        });
+        card.appendChild(opts);
+
+        if(typeof (answers[activeKey]||{})[q.id] === 'number' && q.explanation){
+          const exp = document.createElement('div'); exp.className='exp';
+          exp.innerHTML = `<b>Sharaxaad:</b> ${q.explanation}`;
+          card.appendChild(exp);
+        }
+
+        contentEl.appendChild(card);
+      });
+    }
+
+    function resetSection(){
+      answers[activeKey] = {};
+      renderAll();
+    }
+
+    function renderAll(){
+      renderTabs();
+      renderScore();
+      renderSection();
+    }
+
+    resetBtn.addEventListener('click', resetSection);
+    renderAll();
+  </script></body>
+</html>
